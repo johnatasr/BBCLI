@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Tuple
+from typing import Tuple, Union
 
 import requests
 
@@ -7,8 +7,8 @@ import requests
 class BitbucketService:
     def __init__(self, constants):
         self.c = constants  # c for simplicity
-        self.access_token = None
-        self.refresh_token = None
+        self.access_token: Union[str, None] = None
+        self.refresh_token: Union[str, None] = None
 
     def do_login(self, code: str) -> bool:
         response = requests.post(
@@ -41,7 +41,9 @@ class BitbucketService:
 
         return "Failed to refresh token.", False
 
-    def make_authenticated_request(self, method, url, **kwargs) -> requests.Response:
+    def make_authenticated_request(
+        self, method: str, url: str, **kwargs
+    ) -> requests.Response:
         headers = kwargs.get("headers", {})
         headers["Authorization"] = f"Bearer {self.access_token}"
         headers["Accept"] = "application/json"
@@ -49,7 +51,7 @@ class BitbucketService:
         kwargs["headers"] = headers
         return requests.request(method, url, **kwargs)
 
-    def create_project(self, name, workspace: str) -> bool:
+    def create_project(self, name: str, workspace: str) -> bool:
         payload = {"name": name, "key": name.split(" ")[0].upper(), "is_private": True}
         response = self.make_authenticated_request(
             "POST",
@@ -61,10 +63,10 @@ class BitbucketService:
         response.raise_for_status()
         return response.status_code is HTTPStatus.CREATED.value
 
-    def create_repository(self, project, repo_name, workspace: str) -> bool:
+    def create_repository(self, project: str, repo_name: str, workspace: str) -> bool:
         payload = {
             "scm": "git",
-            "project": {"key": project[:3].upper()},
+            "project": {"key": project.upper()},
             "name": repo_name,
             "is_private": True,
         }
@@ -78,7 +80,9 @@ class BitbucketService:
         response.raise_for_status()
         return response.status_code is HTTPStatus.OK.value
 
-    def add_user_to_repository(self, repository, user_email, workspace: str) -> bool:
+    def add_user_to_repository(
+        self, repository: str, user_email: str, workspace: str
+    ) -> bool:
         response = self.make_authenticated_request(
             "POST",
             "{}/1.0/invitations/{}/{}".format(
@@ -90,7 +94,12 @@ class BitbucketService:
         return response.status_code is HTTPStatus.OK.value
 
     def remove_user_from_repository(
-        self, repository, user_name, workspace, admin, password: str
+        self,
+        repository: str,
+        display_name: str,
+        workspace: str,
+        admin: str,
+        password: str,
     ) -> bool:
         users: list = self.make_authenticated_request(
             "GET",
@@ -100,7 +109,7 @@ class BitbucketService:
         ).json()["values"]
 
         user = next(
-            filter(lambda u: user_name in u["user"]["display_name"], users)
+            filter(lambda u: display_name == u["user"]["display_name"], users)
         ).get("user")
 
         if user_uuid := user.get("uuid"):
@@ -121,7 +130,7 @@ class BitbucketService:
         return False
 
     def allow_users_merge_directly(
-        self, repository, workspace, branch_name: str
+        self, repository: str, workspace: str, branch_name: str
     ) -> bool:
         restriction_type = "restrict_merges"
 
@@ -132,7 +141,7 @@ class BitbucketService:
             "values"
         ]
 
-        if next(filter(lambda e: e["kind"] == restriction_type, restrictions)):
+        if len(list(filter(lambda e: e["kind"] == restriction_type, restrictions))) > 0:
             return True
 
         payload = {"pattern": branch_name, "kind": restriction_type, "users": []}

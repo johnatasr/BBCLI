@@ -22,44 +22,53 @@ BB CLI is a command-line interface tool for interacting with Bitbucket. It provi
 poetry install
 ```
 
-5. Set alias for the python execution in linux with:  `alias bb-cli="python main.py"`
+5. Set alias for the python execution in linux with:  `alias bbcli="python main.py"`
 
 ## Commands
 
-Here are the available commands in BB CLI:
+Here are the available commands in BB CLI using with the created alias:
 
 ### create-project: Creates a new project.
 
 ```bash
-bb-cli create-project -n project_name -w workspace
+bbcli create-project -n project_name -w workspace
 ```
 
 ### create-repository: Creates a new repository.
 
 ```bash
-bb-cli create-repository -p project -r repo_name -w workspace
+bbcli create-repository -p project -r repo_name -w workspace
 ```
 
 ### add-user: Adds a user to a repository.
 
 ```bash
-bb-cli add-user -r repository -e user_email -w workspace
+bbcli add-user -r repository -e user_email -w workspace
 ```
 
 ### remove-user: Removes a user from a repository.
 
 ```bash
-bb-cli remove-user -r repository -u user_name -w workspace -a admin_username -p password
+bbcli remove-user -r repository -u user_name -w workspace -a admin_username -p password
 ```
 
 ### allow-users-merge: Allow all users merge directly in a given branch
 
 ```bash
-bb-cli allow-users-merge -r firstjohn -w johnatas-upwork -b main
+bbcli allow-users-merge -r firstjohn -w johnatas-upwork -b main
 ```
 
 Please replace the arguments with your actual values. For example, replace project_name with the name of your project.
 
+#### Other commans 
+
+``bash
+make tests
+`` - For running all unit tests
+
+``bash
+make lint
+`` - For lint all project
 
 ## Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.

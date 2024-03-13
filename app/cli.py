@@ -36,7 +36,7 @@ def cli(ctx):
 @click.option("-n", "--name", prompt=True, help="Name of the project")
 @click.option("-w", "--workspace", prompt=True, help="Workspace of the project")
 @click.pass_obj
-def create_project(bitbucket_service: BitbucketService, name, workspace: str):
+def create_project(bitbucket_service: BitbucketService, name: str, workspace: str):
     """Create a new project"""
     if bitbucket_service.create_project(name, workspace):
         click.echo(f'Project "{name}" created successfully')
@@ -53,8 +53,8 @@ def create_project(bitbucket_service: BitbucketService, name, workspace: str):
 @click.pass_obj
 def create_repository(
     bitbucket_service: BitbucketService,
-    project,
-    repository,
+    project: str,
+    repository: str,
     workspace: str,
 ):
     """Create a new repository"""
@@ -72,7 +72,10 @@ def create_repository(
 @click.option("-w", "--workspace", prompt=True, help="Workspace of the user to add")
 @click.pass_obj
 def add_user(
-    bitbucket_service: BitbucketService, repository, user_email, workspace: str
+    bitbucket_service: BitbucketService,
+    repository: str,
+    user_email: str,
+    workspace: str,
 ):
     """Add a user to a repository"""
     if bitbucket_service.add_user_to_repository(repository, user_email, workspace):
@@ -87,7 +90,14 @@ def add_user(
 @click.option(
     "-r", "--repository", prompt=True, help="Name of the repository to remove user from"
 )
-@click.option("-u", "--user_name", prompt=True, help="Username of the user to remove")
+@click.option(
+    "-d",
+    "--display_name",
+    nargs=2,
+    type=str,
+    prompt=True,
+    help="Full name shown in the Bitbucket platform",
+)
 @click.option("-w", "--workspace", prompt=True, help="Workspace of the user to remove")
 @click.option(
     "-a",
@@ -97,25 +107,27 @@ def add_user(
 )
 @click.option(
     "-p",
-    "--password",
+    "--app_password",
     prompt=True,
     help="Admin app password of the repository to remove",
 )
 @click.pass_obj
 def remove_user(
     bitbucket_service: BitbucketService,
-    repository,
-    user_name,
-    workspace,
-    admin_username,
-    password: str,
+    repository: str,
+    display_name: str,
+    workspace: str,
+    admin_username: str,
+    app_password: str,
 ):
     """Remove a user from a repository"""
+    first_name, second_name = display_name
+    formatted_name = "{} {}".format(first_name, second_name)
     if bitbucket_service.remove_user_from_repository(
-        repository, user_name, workspace, admin_username, password
+        repository, formatted_name, workspace, admin_username, app_password
     ):
         click.echo(
-            f'User "{user_name}" removed from repository "{repository}" successfully'
+            f'User "{formatted_name}" removed from repository "{repository}" successfully'
         )
         return
     click.echo(f"Failed to remove user from repository: some text")
@@ -131,7 +143,7 @@ def remove_user(
 )
 @click.pass_obj
 def allow_users_merge(
-    bitbucket_service: BitbucketService, repository, workspace, branch: str
+    bitbucket_service: BitbucketService, repository: str, workspace: str, branch: str
 ):
     """Allow all users to merge directly in a given branch"""
     if bitbucket_service.allow_users_merge_directly(repository, workspace, branch):

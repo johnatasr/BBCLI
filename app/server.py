@@ -17,7 +17,7 @@ class CallbackHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(
                 bytes(
-                    f"<html><body>Authorization successful. You can now close this window. your code is: <h1>{authorization_code}</h1> </body></html>",
+                    f"<html><body><h4>Authorization successful. You can now close this window, your code is: </h4><h1>{authorization_code}</h1> </body></html>",
                     "utf-8",
                 )
             )
@@ -26,7 +26,9 @@ class CallbackHandler(BaseHTTPRequestHandler):
             self.send_response(400)
             self.send_header("Content-type", "text/html")
             self.end_headers()
-            self.wfile.write(bytes("<html><body>Bad request</body></html>", "utf-8"))
+            self.wfile.write(
+                bytes("<html><body<h1>Bad request</h1></body></html>", "utf-8")
+            )
 
 
 def run_callback_server(click):

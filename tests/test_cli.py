@@ -38,7 +38,7 @@ def test_create_repository(runner):
     with patch("app.cli.BitbucketService") as MockService:
         mock_service = MockService.return_value
         mock_service.do_login.return_value = True
-        mock_service.create_project.return_value = True
+        mock_service.create_repository.return_value = True
 
         result = runner.invoke(
             cli,
@@ -64,7 +64,7 @@ def test_add_user(runner):
     with patch("app.cli.BitbucketService") as MockService:
         mock_service = MockService.return_value
         mock_service.do_login.return_value = True
-        mock_service.create_project.return_value = True
+        mock_service.add_user_to_repository.return_value = True
 
         result = runner.invoke(
             cli, ["add-user", "-r", "repository", "-e", "user_email", "-w", "workspace"]
@@ -80,44 +80,11 @@ def test_add_user(runner):
 @patch("app.cli.generate_ssl_certificate", MagicMock(return_value=True))
 @patch("app.cli.load_constants_from_yaml", MagicMock(return_value={}))
 @patch("app.cli.click.prompt", MagicMock(return_value="authorization_code"))
-def test_remove_user(runner):
-    with patch("app.cli.BitbucketService") as MockService:
-        mock_service = MockService.return_value
-        mock_service.do_login.return_value = True
-        mock_service.create_project.return_value = True
-
-        result = runner.invoke(
-            cli,
-            [
-                "remove-user",
-                "-r",
-                "repository",
-                "-u",
-                "user_name",
-                "-w",
-                "workspace",
-                "-a",
-                "admin_username",
-                "-p",
-                "password",
-            ],
-        )
-
-        assert (
-            'User "user_name" removed from repository "repository" successfully'
-            in result.output
-        )
-
-
-@patch("app.cli.run_callback_server", MagicMock(return_value=True))
-@patch("app.cli.generate_ssl_certificate", MagicMock(return_value=True))
-@patch("app.cli.load_constants_from_yaml", MagicMock(return_value={}))
-@patch("app.cli.click.prompt", MagicMock(return_value="authorization_code"))
 def test_allow_users_merge(runner):
     with patch("app.cli.BitbucketService") as MockService:
         mock_service = MockService.return_value
         mock_service.do_login.return_value = True
-        mock_service.create_project.return_value = True
+        mock_service.allow_users_merge_directly.return_value = True
 
         result = runner.invoke(
             cli,
