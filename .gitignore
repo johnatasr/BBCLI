@@ -135,5 +135,4 @@ dmypy.json
 db.sqlite
 test.db.sqlite
 
-
-bin/*
+bin/server.pem
