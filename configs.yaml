@@ -1,6 +1,6 @@
 constants:
   BITBUCKET_API_BASE_URL: "https://api.bitbucket.org"
   BITBUCKET_OAUTH2_URL: "https://bitbucket.org/site/oauth2"
-  CLIENT_ID: "vCLK5A2WhyPFVGby5F"
-  CLIENT_SECRET: "CEdj7mA4QkqfdKWcMQ6cL4gBmvYCXs2V"
+  CLIENT_ID: "YOUR_CLIENT_ID"
+  CLIENT_SECRET: "YOUR_SECRET"
   CALLBACK_URL: "https://localhost:3000/callback"
