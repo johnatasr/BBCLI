@@ -16,13 +16,15 @@ BB CLI is a command-line interface tool for interacting with Bitbucket. It provi
 
 3. Clone the repository to your local machine.
 
-4. Navigate to the project directory and install the project dependencies with Poetry:
+4. Configure the file config.yaml with your `CLIENT_ID` and `CLIENT_SECRET` from Bitbucket OAuth Consumer
+
+5. Navigate to the project directory and install the project dependencies with Poetry:
 
 ```bash
 poetry install
 ```
 
-5. Set alias for the python execution in linux with:  `alias bbcli="python main.py"`
+6. Set alias for the python execution in linux with:  `alias bbcli="python main.py"`
 
 ## Commands
 
