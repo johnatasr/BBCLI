@@ -7,13 +7,15 @@ from app.utils import load_constants_from_yaml
 
 
 @click.group()
-@click.pass_context
-def cli(ctx):
+def cli():
     """Bitbucket CLI Tool"""
+
+
+def init_bitbucket_service(internal_click: click) -> BitbucketService:
     constants = load_constants_from_yaml("./configs.yaml")
 
-    click.echo("Please visit the following URL to authorize the application:")
-    click.echo(
+    internal_click.echo("Please visit the following URL to authorize the application:")
+    internal_click.echo(
         "{}/authorize?client_id={}&response_type=code".format(
             constants.get("BITBUCKET_OAUTH2_URL"), constants.get("CLIENT_ID")
         )
@@ -22,22 +24,25 @@ def cli(ctx):
     generate_ssl_certificate(click)
     run_callback_server(click)
 
-    code = click.prompt("Enter the authorization code from the callback URL")
+    code = internal_click.prompt("Enter the authorization code from the callback URL")
 
-    ctx.obj = BitbucketService(constants)
-    if ctx.obj.do_login(code):
-        click.echo("Login successful.")
-        click.echo("running ...")
+    bitbucket_service = BitbucketService(constants)
+    if bitbucket_service.do_login(code):
+        internal_click.echo("Login successful.")
+        internal_click.echo("running ...")
+        return bitbucket_service
     else:
-        click.echo("Login failed. Please try again.")
+        internal_click.ClickException("Login failed. Please try again")
 
 
 @cli.command()
-@click.option("-n", "--name", prompt=True, help="Name of the project")
-@click.option("-w", "--workspace", prompt=True, help="Workspace of the project")
-@click.pass_obj
-def create_project(bitbucket_service: BitbucketService, name: str, workspace: str):
+@click.option("-n", "--name", required=True, prompt=True, help="Name of the project")
+@click.option(
+    "-w", "--workspace", required=True, prompt=True, help="Workspace of the project"
+)
+def create_project(name: str, workspace: str):
     """Create a new project"""
+    bitbucket_service: BitbucketService = init_bitbucket_service(click)
     if bitbucket_service.create_project(name, workspace):
         click.echo(f'Project "{name}" created successfully')
         return
@@ -46,18 +51,25 @@ def create_project(bitbucket_service: BitbucketService, name: str, workspace: st
 
 @cli.command()
 @click.option(
-    "-p", "--project", prompt=True, help="Name of the repository to be created"
+    "-p",
+    "--project",
+    required=True,
+    prompt=True,
+    help="Name of the repository to be created",
 )
-@click.option("-r", "--repository", prompt=True, help="Name of the repository")
-@click.option("-w", "--workspace", prompt=True, help="Workspace of the repository")
-@click.pass_obj
+@click.option(
+    "-r", "--repository", required=True, prompt=True, help="Name of the repository"
+)
+@click.option(
+    "-w", "--workspace", required=True, prompt=True, help="Workspace of the repository"
+)
 def create_repository(
-    bitbucket_service: BitbucketService,
     project: str,
     repository: str,
     workspace: str,
 ):
     """Create a new repository"""
+    bitbucket_service: BitbucketService = init_bitbucket_service(click)
     if bitbucket_service.create_repository(project, repository, workspace):
         click.echo(f'Repository "{repository}" created successfully')
         return
@@ -66,18 +78,25 @@ def create_repository(
 
 @cli.command()
 @click.option(
-    "-r", "--repository", prompt=True, help="Name of the repository to add user to"
+    "-r",
+    "--repository",
+    required=True,
+    prompt=True,
+    help="Name of the repository to add user to",
 )
-@click.option("-e", "--user_email", prompt=True, help="User email to add")
-@click.option("-w", "--workspace", prompt=True, help="Workspace of the user to add")
-@click.pass_obj
+@click.option(
+    "-e", "--user_email", required=True, prompt=True, help="User email to add"
+)
+@click.option(
+    "-w", "--workspace", required=True, prompt=True, help="Workspace of the user to add"
+)
 def add_user(
-    bitbucket_service: BitbucketService,
     repository: str,
     user_email: str,
     workspace: str,
 ):
     """Add a user to a repository"""
+    bitbucket_service: BitbucketService = init_bitbucket_service(click)
     if bitbucket_service.add_user_to_repository(repository, user_email, workspace):
         click.echo(
             f'User "{user_email}" added to repository "{repository}" successfully'
@@ -88,7 +107,11 @@ def add_user(
 
 @cli.command()
 @click.option(
-    "-r", "--repository", prompt=True, help="Name of the repository to remove user from"
+    "-r",
+    "--repository",
+    required=True,
+    prompt=True,
+    help="Name of the repository to remove user from",
 )
 @click.option(
     "-d",
@@ -96,24 +119,31 @@ def add_user(
     nargs=2,
     type=str,
     prompt=True,
+    required=True,
     help="Full name shown in the Bitbucket platform",
 )
-@click.option("-w", "--workspace", prompt=True, help="Workspace of the user to remove")
+@click.option(
+    "-w",
+    "--workspace",
+    required=True,
+    prompt=True,
+    help="Workspace of the user to remove",
+)
 @click.option(
     "-a",
     "--admin_username",
+    required=True,
     prompt=True,
     help="Admin username of the repository to remove",
 )
 @click.option(
     "-p",
     "--app_password",
+    required=True,
     prompt=True,
     help="Admin app password of the repository to remove",
 )
-@click.pass_obj
 def remove_user(
-    bitbucket_service: BitbucketService,
     repository: str,
     display_name: str,
     workspace: str,
@@ -121,6 +151,7 @@ def remove_user(
     app_password: str,
 ):
     """Remove a user from a repository"""
+    bitbucket_service: BitbucketService = init_bitbucket_service(click)
     first_name, second_name = display_name
     formatted_name = "{} {}".format(first_name, second_name)
     if bitbucket_service.remove_user_from_repository(
@@ -135,17 +166,30 @@ def remove_user(
 
 @cli.command()
 @click.option(
-    "-r", "--repository", prompt=True, help="Name of the repository to grant permission"
+    "-r",
+    "--repository",
+    required=True,
+    prompt=True,
+    help="Name of the repository to grant permission",
 )
-@click.option("-w", "--workspace", prompt=True, help="Workspace of the user to remove")
 @click.option(
-    "-b", "--branch", prompt=True, default="main", help="Branch name to be applied"
+    "-w",
+    "--workspace",
+    required=True,
+    prompt=True,
+    help="Workspace of the user to remove",
 )
-@click.pass_obj
-def allow_users_merge(
-    bitbucket_service: BitbucketService, repository: str, workspace: str, branch: str
-):
+@click.option(
+    "-b",
+    "--branch",
+    required=True,
+    prompt=True,
+    default="main",
+    help="Branch name to be applied",
+)
+def allow_users_merge(repository: str, workspace: str, branch: str):
     """Allow all users to merge directly in a given branch"""
+    bitbucket_service: BitbucketService = init_bitbucket_service(click)
     if bitbucket_service.allow_users_merge_directly(repository, workspace, branch):
         click.echo(f"Users allowed to merge successfully")
         return
