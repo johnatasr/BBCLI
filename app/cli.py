@@ -32,7 +32,7 @@ def init_bitbucket_service(internal_click: click) -> BitbucketService:
         internal_click.echo("running ...")
         return bitbucket_service
     else:
-        raise SystemError("Login failed. Please try again")
+        raise SystemExit("Login failed. Please try again")
 
 
 @cli.command()
