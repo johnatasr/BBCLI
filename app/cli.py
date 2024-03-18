@@ -161,7 +161,7 @@ def remove_user(
             f'User "{formatted_name}" removed from repository "{repository}" successfully'
         )
         return
-    click.echo(f"Failed to remove user from repository: some text")
+    click.echo(f"Failed to remove user from repository")
 
 
 @cli.command()

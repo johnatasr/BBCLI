@@ -46,8 +46,8 @@ def generate_ssl_certificate(click):
             pem_file.write(key_content)
             pem_file.write(crt_content)
 
-    except Exception:
-        raise
+    except Exception as exp:
+        raise exp
     finally:
         os.remove("server.key")
         os.remove("server.csr")
