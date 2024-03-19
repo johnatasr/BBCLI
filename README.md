@@ -10,21 +10,20 @@ BB CLI is a command-line interface tool for interacting with Bitbucket. It provi
 
 ## Setting Up the Environment
 
-1. Make sure you have Python 3.10 or above installed. You can check your Python version by running `python --version` in your terminal.
+1. If you are using Debian/Ubuntu based OS, run the installer `. install.sh` and jump to step 7.
 
-2. Install Poetry by following the instructions on the official Poetry website.
+2. Make sure you have Python 3.12 installed. You can check your Python version by running `python --version` in your terminal.
 
-3. Clone the repository to your local machine.
+3. Install Poetry by following the instructions on the official Poetry website.
 
-4. Configure the file config.yaml with your `CLIENT_ID` and `CLIENT_SECRET` from Bitbucket OAuth Consumer
-
-5. Navigate to the project directory and install the project dependencies with Poetry:
-
+4. Navigate to the project directory and install the project dependencies with Poetry:
 ```bash
 poetry install
 ```
 
-6. Set alias for the python execution in linux with:  `alias bbcli="python main.py"`
+5. Set alias for the python execution in linux with:  `alias bbcli="python main.py"`
+
+6. Configure the file config.yaml with your `CLIENT_ID` and `CLIENT_SECRET` from Bitbucket OAuth Consumer
 
 ## Commands
 
@@ -48,7 +47,7 @@ bbcli create-repository -p project -r repo_name -w workspace
 bbcli add-user -r repository -e user_email -w workspace
 ```
 
-### remove-user: Removes a user from a repository.
+### remove-user: Removes a user from a repository. (Necessary user and app password crendentials)
 
 ```bash
 bbcli remove-user -r repository -u user_name -w workspace -a admin_username -p password

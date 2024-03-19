@@ -99,7 +99,7 @@ def add_user(
     bitbucket_service: BitbucketService = init_bitbucket_service(click)
     if bitbucket_service.add_user_to_repository(repository, user_email, workspace):
         click.echo(
-            f'User "{user_email}" added to repository "{repository}" successfully'
+            f'Invite sent to "{user_email}" successfully, request for repository "{repository}"'
         )
         return
     click.echo(f"Failed to add user to repository")

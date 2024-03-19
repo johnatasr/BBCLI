@@ -136,3 +136,4 @@ db.sqlite
 test.db.sqlite
 
 bin/server.pem
+bbclienv
